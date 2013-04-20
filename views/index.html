@@ -173,24 +173,24 @@
             <h4>Runtime Controls</h4>
             <ul>
             <li>
-                <div class='control' data-slidervar="samplingSize" data-min="500" data-max="2000" data-step="100" data-value="800">
+                <div class='control' data-slidervar="amountDifferentToBeMoving" data-min="1" data-max="5" data-step="1" data-value="2">
                 </div>
-                <div class='label'> Sampling Size </div>
+                <div class='label'> Delta to be moving </div>
             </li>
             <li>
-                <div class='control' data-slidervar="movingDownThreshold" data-min="1" data-max="1.4" data-step="0.02" data-value="1">
+                <div class='control' data-slidervar="numberToSampleForDeltaToBeMoving" data-min="1" data-max="10" data-step="1" data-value="5">
                 </div>
-                <div class='label'> Moving Down Threshold </div>
+                <div class='label'> Amount to sample for delta </div>
             </li>
             <li>
-                <div class='control' data-slidervar="resultsToKeep" data-min="5" data-max="40" data-value="15">
+                <div class='control' data-slidervar="recentMeansSize" data-min="10" data-max="20" data-value="15">
                 </div>
-                <div class='label'> Result Set Size </div>
+                <div class='label'> Recent Means Size </div>
             </li>
             <li>
-                <div class='control' data-slidervar="movingDownRateThreshold" data-min="0" data-max=".95" data-value="0" data-step=".1">
+                <div class='control' data-slidervar="numberToSampleForRecentlyMovingDownward" data-min="2" data-max="8" data-value="4">
                 </div>
-                <div class='label'> Moving Down Rate Threshold </div>
+                <div class='label'> Amount to sample for recently moving </div>
             </li>
             <li><label>
                 <input type="checkbox" id="show-areas" class="control">
@@ -199,6 +199,10 @@
             <li><label>
                 <input type="checkbox" id="lefthanded" class="control">
                 <span class="label">Lefthanded</span>
+            </label></li>
+            <li><label>
+                <input type="checkbox" id="no-upstroke-check" class="control" checked>
+                <span class="label">No Upstroke Check</span>
             </label></li>
         </ul>
         </div>
@@ -242,7 +246,7 @@
                         style.href = ~style.href.indexOf('/united-') ? style.href.replace('/united-', '/geo-') : style.href.replace('/geo-', '/united-')
                 });
 
-
+                window.app.downstrokeFilter = {}
                 $('[data-slidervar]').each(function(i, slider) {
                     slider = $(this)
                     var vars = slider.data();
@@ -253,7 +257,7 @@
                         value: parseFloat(vars.value, 10),
                         orientation: 'vertical',
                         slide: function(event, ui) {
-                            window.app[vars.slidervar] = ui.value;
+                            window.app.downstrokeFilter[vars.slidervar] = ui.value;
                             console.log("current app is", window.app);
                         }
                     };
@@ -267,6 +271,10 @@
 
                 $('#lefthanded').on('change', function(){
                     window.app.soundFileTransform = $(this).prop('checked') ? _.identity : function(x) { return 2-x };
+                }).trigger('change');
+
+                $('#no-upstroke-check').on('change', function(){
+                    window.app.noUpstrokeCheck = $(this).prop('checked');
                 }).trigger('change');
             })
 

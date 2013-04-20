@@ -249,7 +249,7 @@ $(function() {
       }
     }
 
-    if ((highScore > lowestHighScore) && isChangedToUpstroke()) {
+    if ((highScore > lowestHighScore) && (window.app.noUpstrokeCheck || isChangedToUpstroke()) ) {
       fireSoundClip(targetX, targetY);
     }
   }
@@ -288,29 +288,23 @@ $(function() {
     return wasRecentlyMovingDownward();
   }
 
-  var ducky = {
-     amountDifferentToBeMoving: 2
-    ,numberToSampleForDeltaToBeMoving: 5
-    ,recentMeansSize: 15
-    ,numberToSampleForRecentlyMovingDownward: 4
-  }
   function isMoving(direction) {
     return wasMoving(direction, recentMeans.length-1);
   }
   function wasMoving(direction, indexOfItem) {
     var thisMean = recentMeans[indexOfItem].value;
-    var mustExceed = direction * ducky.amountDifferentToBeMoving + thisMean;
-    var toCompareTo = recentMeans.slice( indexOfItem-ducky.numberToSampleForDeltaToBeMoving-1, indexOfItem);
-    var necessaryForConcensus = ducky.numberToSampleForDeltaToBeMoving/2;
+    var mustExceed = direction * window.app.downstrokeFilter.amountDifferentToBeMoving + thisMean;
+    var toCompareTo = recentMeans.slice( indexOfItem-window.app.downstrokeFilter.numberToSampleForDeltaToBeMoving-1, indexOfItem);
+    var necessaryForConcensus = window.app.downstrokeFilter.numberToSampleForDeltaToBeMoving/2;
     var comparison = direction == -1 ? function(x){ return x.value > mustExceed} : function(x){ return x.value < mustExceed};
     return most(toCompareTo, necessaryForConcensus, comparison);
   }
 
   function wasRecentlyMovingDownward() {
-    var lowerBound = recentMeans.length-ducky.numberToSampleForRecentlyMovingDownward-1;
+    var lowerBound = recentMeans.length-window.app.downstrokeFilter.numberToSampleForRecentlyMovingDownward-1;
     if(lowerBound < 0) lowerBound = 0;
     var recentMotion = !recentMeans.length ? [] : _.range(lowerBound, recentMeans.length -1);
-    var necessaryForConcensus = ducky.numberToSampleForRecentlyMovingDownward/2;
+    var necessaryForConcensus = window.app.downstrokeFilter.numberToSampleForRecentlyMovingDownward/2;
     return most(recentMotion, necessaryForConcensus, function(x){ return wasMoving(+1, x); });
   }
 
@@ -358,7 +352,7 @@ $(function() {
 
   function enqueue(mean, isTrueMean) {
     recentMeans.push({value: mean, isTrueMean: isTrueMean});
-    if (recentMeans.length > ducky.recentMeansSize) recentMeans.shift();
+    if (recentMeans.length > window.app.downstrokeFilter.recentMeansSize) recentMeans.shift();
   }
 
   function sum(arr) {
@@ -371,6 +365,6 @@ $(function() {
   function draw() {
     getDifference();
     scoreByScan();
-    takeCloudTemperature();
+    window.app.noUpstrokeCheck || takeCloudTemperature();
   }
 });
