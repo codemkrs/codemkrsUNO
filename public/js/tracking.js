@@ -17,17 +17,18 @@ $(function() {
     var areaRange = vidWidth / 3;
     if (targetx < areaRange) {
       console.log('area 1');
-      area = 1;
+      area = 'snare';
     } else if (targetx < areaRange * 2) {
       console.log('area 2');
-      area = 2;
+      area = 'kick';
     } else if (targetx < areaRange * 3) {
       console.log('area 3');
-      area = 3;
+      area = 'hihat';
     }
+
     window.enterArea.fire({
       type: "motionTrackEvent",
-      message: area,
+      sound: area,
       time: new Date()
     });
   }
@@ -420,9 +421,7 @@ $(function() {
     canvas.putImageData(tmpPixels, 0, 0);
   }
 
-  window.enterArea.add(function(data){
-  
-})
+ 
 
 
 });
