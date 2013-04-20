@@ -438,7 +438,8 @@ $(function() {
 
   function isProbablyMovingDown() {
     //console.log("guesses", movementGuesses, sum(movementGuesses)/movementGuesses.length);
-    return sum(movementGuesses) / movementGuesses.length > window.app.movingDownRateThreshold;
+    return !window.app.movingDownRateThreshold 
+          || ( sum(movementGuesses) / movementGuesses.length > window.app.movingDownRateThreshold );
   }
 
   function sum(arr) {
