@@ -1,0 +1,105 @@
+<html>
+<head>
+	<title>Sound Playground</title>
+	<style>
+	.play {
+	    display:inline-block;
+	    margin:5px;
+	    width: 24px;
+	    height: 32px;
+	    background-repeat: no-repeat;
+	    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAMZJREFUeNq0lt0NgzAMhIPlfWAR1BXYpDBSxSCFiYr70CqKUH6cO0t+SEC++xxkIvP8eFuOgRRiOVkeJvJkCAxW+BOtD8tl318nkiAOOE1KENA0knkGockRQGik8j03TS2Bm0YcbW2i8RA00UjnZ16k6SUo0ghw7NzSIAluaSRw4k/DEqCcQdqiyVq0KaH4+i38WyjjYONNZbhGChRHhTJc9wo0jWtluPYIuH+ZynBdKwC5tijDdU4AfnVUhutUAO46jkuAAQD+jXZOTODXVwAAAABJRU5ErkJggg==);
+	    text-indent:-200px;
+	}
+	.stop {
+	    display:inline-block;
+	    margin:5px;
+	    width: 32px;
+	    height: 32px;
+	    background-repeat: no-repeat;
+	    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACxJREFUeNrszUERAAAEADD0c/q3UYLfVmDZPfGp4plAIBAIBAKBQCC4sgIMAJggASlttpE8AAAAAElFTkSuQmCC);
+	    text-indent:-200px;
+	}
+	p:hover {
+	    cursor:pointer;
+	    opacity:0.8;
+	}
+
+	</style>
+</head>
+<body>
+  <p class="play">Play</p>
+  <p class="stop">Stop</p>
+
+<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
+<script>
+	$(function(){
+    var context, 
+        soundSource, 
+        soundBuffer,
+        url = 'http://thelab.thingsinjars.com/web-audio-tutorial/hello.mp3';
+
+    // Step 1 - Initialise the Audio Context
+    // There can be only one!
+    function init() {
+        if (typeof AudioContext !== "undefined") {
+            context = new AudioContext();
+        } else if (typeof webkitAudioContext !== "undefined") {
+            context = new webkitAudioContext();
+        } else {
+            throw new Error('AudioContext not supported. :(');
+        }
+    }
+
+    function getSound(url) {
+    	return $.Deferred(function(d) {
+	        var request = new XMLHttpRequest();
+	        request.open("GET", url, true);
+	        request.responseType = "arraybuffer";
+	        request.onload = function(){ d.resolve(request.response, request); }
+	        request.onerror = function(){ d.reject(request.response, request); }
+        	request.send();
+    	});
+    }
+    function startSound() {
+    	getSound(url).done(audioGraph)
+    }
+
+    function playSound() {
+        soundSource.noteOn(context.currentTime);
+    }
+
+    function stopSound() {
+        // stop the source now
+        soundSource.noteOff(context.currentTime);
+    }
+
+    // Events for the play/stop bottons
+    document.querySelector('.play').addEventListener('click', startSound);
+    document.querySelector('.stop').addEventListener('click', stopSound);
+
+
+    // This is the code we are interested in
+    function audioGraph(audioData) {
+        // create a sound source
+        soundSource = context.createBufferSource();
+
+        // The Audio Context handles creating source buffers from raw binary
+        soundBuffer = context.createBuffer(audioData, true/* make mono */);
+      
+        // Add the buffered data to our object
+        soundSource.buffer = soundBuffer;
+
+        // Plug the cable from one thing to the other
+        soundSource.connect(context.destination);
+
+        // Finally
+        playSound(soundSource);
+    }
+
+
+    init();
+	});
+</script>
+</body>
+</html>
