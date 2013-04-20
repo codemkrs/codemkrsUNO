@@ -249,7 +249,7 @@ $(function() {
       }
     }
 
-    if ((highScore > lowestHighScore) && isProbablyMovingDown()) {
+    if ((highScore > lowestHighScore) && isChangedToUpstroke()) {
       fireSoundClip(targetX, targetY);
     }
   }
@@ -264,6 +264,104 @@ $(function() {
     prevCenterOfMassY = centerOfMassY(prevSampling);
     if (!isFinite(prevCenterOfMassY)) prevCenterOfMassY = 0;
   }
+
+  // when detecting motion
+  //  if you are _moving up_ and were _previously_ _moving down_
+  //  play sound
+
+  // moving up:
+  // The cloud's mean Y is _lower_ than _previous mean Ys_
+
+  // on tick:
+  //   calculate mean y of the cloud 
+  //   if there is a mean (_enough data points_) enqueue value
+  //   else if there _recently_ was a true mean, 
+  //      enqueue that mean
+  //      record false mean
+  //   else zero out queue 
+
+  var tapLog = function(msg, val) {
+    console.log(msg, val);
+    return val;
+  }
+
+  var recentMeans = []
+  function isChangedToUpstroke() {
+    if(!isMoving(-1) )
+      return false;
+    return tapLog("wasRecentlyMovingDownward", wasRecentlyMovingDownward());
+  }
+
+  var ducky = {
+     amountDifferentToBeMoving: 4
+    ,numberToSampleForDeltaToBeMoving: 3
+    ,recentMeansSize: 15
+    ,numberToSampleForRecentlyMovingDownward: 4
+  }
+  function isMoving(direction) {
+    return wasMoving(direction, recentMeans.length-1);
+  }
+  function wasMoving(direction, indexOfItem) {
+    var thisMean = recentMeans[indexOfItem].value;
+    var mustExceed = direction * ducky.amountDifferentToBeMoving + thisMean;
+    var toCompareTo = recentMeans.slice( indexOfItem-ducky.numberToSampleForDeltaToBeMoving-1, indexOfItem);
+    var necessaryForConcensus = ducky.numberToSampleForDeltaToBeMoving/2;
+    return most(toCompareTo, necessaryForConcensus, function(x){ return x.value > mustExceed});
+  }
+
+  function wasRecentlyMovingDownward() {
+    var recentMotion = recentMeans.slice(-1*ducky.numberToSampleForRecentlyMovingDownward-1, -1);
+    var necessaryForConcensus = ducky.numberToSampleForRecentlyMovingDownward/2;
+    return most(recentMotion, necessaryForConcensus, function(x, i){ return wasMoving(+1, i); });
+  }
+
+  function most(arr, necessaryForConcensus, test) {
+    var voteExceeded = 0;
+    for(var i = 0; i<arr.length;i++) {
+      if( test(arr[i], i) ) 
+        voteExceeded+=1;
+      if(voteExceeded >= necessaryForConcensus) 
+        return true;     
+    }
+    return false; 
+
+  }
+
+  function takeCloudTemperature() {
+    var mean = calcMeanY();
+    if(mean !== null)
+      return enqueue(mean, true);
+    var recentTrueMean = getRecentTrueMean()
+    if(recentTrueMean !== null) {
+      return enqueue(recentTrueMean, false);
+    }
+    recentMeans.length = 0;
+  }
+
+  function calcMeanY() {
+    var x,y,col,onYs = [];
+    for(x=columns.length-1;x>=0;x--){
+      col = columns[x];
+      for(y=col.length-1;y>=0;y--) {
+        if(col[y]){ onYs.push(y); }
+      }
+    }
+    return sum(onYs) / onYs.length;
+  }
+
+  function getRecentTrueMean(){
+    for(var len = recentMeans.length, i = len-1; i > len-3; i--) {
+      if(recentMeans[i].isTrueMean)
+        return recentMeans[i].value;
+    }
+    return null;
+  }
+
+  function enqueue(mean, isTrueMean) {
+    recentMeans.push({value: mean, isTrueMean: isTrueMean});
+    if (recentMeans.length > ducky.recentMeansSize) recentMeans.shift();
+  }
+
 
   var prevSampling = [];
 
@@ -317,6 +415,6 @@ $(function() {
   function draw() {
     getDifference();
     scoreByScan();
-    window.app.movingDownRateThreshold && sampleMotion();
+    takeCloudTemperature();
   }
 });
