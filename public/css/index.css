@@ -97,6 +97,20 @@ canvas {
   transition: 0.1s linear background-image;
   overflow: visible; }
 
+.area-marker {
+  width: 106px;
+  height: 242px;
+  border: 1px solid grey;
+  box-sizing: border-box;
+  position: absolute;
+  border-collapse: collapse;
+  top: 50; }
+  .area-marker.area2 {
+    left: 156px; }
+  .area-marker.area3 {
+    left: 262px;
+    border-right: 0; }
+
 #runtime-controls {
   position: fixed;
   bottom: 0;
@@ -113,7 +127,8 @@ canvas {
     opacity: 1; }
   #runtime-controls li {
     display: inline-block; }
-  #runtime-controls .slider {
+  #runtime-controls .control {
+    display: block;
     margin: 0 auto 1em auto; }
   #runtime-controls .label {
     padding: .2em; }

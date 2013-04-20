@@ -55,6 +55,10 @@
                         height="240">
                         </canvas>
                     </div>
+                    <div class="area-marker area1"></div>
+                    <div class="area-marker area2"></div>
+                    <div class="area-marker area3"></div>
+
                     <div class="visualEffect crunch" style="display: none">
                     </div>
                     <div class="visualEffect kapow" style="display: none">
@@ -165,25 +169,29 @@
             <h4>Runtime Controls</h4>
             <ul>
             <li>
-                <div class='slider' data-slidervar="samplingSize" data-min="500" data-max="2000" data-step="100" data-value="800">
+                <div class='control' data-slidervar="samplingSize" data-min="500" data-max="2000" data-step="100" data-value="800">
                 </div>
                 <div class='label'> Sampling Size </div>
             </li>
             <li>
-                <div class='slider' data-slidervar="movingDownThreshold" data-min="1" data-max="1.4" data-step="0.02" data-value="1">
+                <div class='control' data-slidervar="movingDownThreshold" data-min="1" data-max="1.4" data-step="0.02" data-value="1">
                 </div>
                 <div class='label'> Moving Down Threshold </div>
             </li>
             <li>
-                <div class='slider' data-slidervar="resultsToKeep" data-min="5" data-max="40" data-value="15">
+                <div class='control' data-slidervar="resultsToKeep" data-min="5" data-max="40" data-value="15">
                 </div>
                 <div class='label'> Result Set Size </div>
             </li>
             <li>
-                <div class='slider' data-slidervar="movingDownRateThreshold" data-min="0" data-max=".95" data-value=".6" data-step=".2">
+                <div class='control' data-slidervar="movingDownRateThreshold" data-min="0" data-max=".95" data-value=".6" data-step=".2">
                 </div>
                 <div class='label'> Moving Down Rate Threshold </div>
             </li>
+            <li><label>
+                <input type="checkbox" id="show-areas" class="control">
+                <span class="label">Show Areas</span>
+            </label></li>
         </ul>
         </div>
         <script src="http://code.jquery.com/jquery-2.0.0.js">
@@ -245,6 +253,10 @@
                     op.slide(null, {value: op.value});
                     slider.slider(op);
                 }).trigger('slideslide');
+
+                $('#show-areas').on('change', function(){
+                    $('.area-marker').toggle($(this).prop('checked'));
+                }).trigger('change');
 
             })
 

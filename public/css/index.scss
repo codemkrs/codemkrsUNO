@@ -105,6 +105,24 @@ canvas {
 
     }
 
+	.area-marker {
+		width: 106px;
+		height: 242px;
+		border: 1px solid grey;
+		box-sizing: border-box;
+		position: absolute;
+		border-collapse: collapse;
+		top: 50;
+
+		&.area2 {
+			left: 106px+50px;
+		}	
+		&.area3 { 
+			left: 2*(106px)+50px;
+			border-right: 0;
+		}
+	}
+	
     #runtime-controls {
     	position: fixed;
     	bottom: 0;
@@ -123,7 +141,8 @@ canvas {
 		}
     	li { display: inline-block; }
 
-		.slider{
+		.control {
+			display: block;
 			margin: 0 auto 1em auto;
 		}
 		.label{

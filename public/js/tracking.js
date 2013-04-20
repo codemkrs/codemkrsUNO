@@ -459,7 +459,7 @@ $(function() {
 
   function draw() {
     getDifference();
-    window.app.movingDownRateThreshold && scoreByScan();
-    sampleMotion();
+    scoreByScan();
+    window.app.movingDownRateThreshold && sampleMotion();
   }
 });
