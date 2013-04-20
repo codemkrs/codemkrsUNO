@@ -188,7 +188,7 @@
                 <div class='label'> Result Set Size </div>
             </li>
             <li>
-                <div class='control' data-slidervar="movingDownRateThreshold" data-min="0" data-max=".95" data-value=".4" data-step=".1">
+                <div class='control' data-slidervar="movingDownRateThreshold" data-min="0" data-max=".95" data-value="0" data-step=".1">
                 </div>
                 <div class='label'> Moving Down Rate Threshold </div>
             </li>
@@ -266,7 +266,7 @@
                 }).trigger('change');
 
                 $('#lefthanded').on('change', function(){
-                    window.soundFileTransform = $(this).prop('checked') ? _.identity : function(x) { return 2-x };
+                    window.app.soundFileTransform = $(this).prop('checked') ? _.identity : function(x) { return 2-x };
                 }).trigger('change');
             })
 
