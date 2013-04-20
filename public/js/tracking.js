@@ -419,5 +419,9 @@ $(function() {
     canvas.putImageData(tmpPixels, 0, 0);
   }
 
+  window.enterArea.add(function(data){
+  
+})
+
 
 });
