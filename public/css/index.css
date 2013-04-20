@@ -4,3 +4,7 @@
 .visualEffects {
   width: 32px;
   height: 32px; }
+
+canvas {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); }

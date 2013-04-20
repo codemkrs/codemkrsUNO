@@ -6,21 +6,22 @@ $(function() {
   var vidEl = document.querySelector("#js-video"),
     canvas = document.querySelector('#js-snapshot').getContext('2d'),
     n = window.navigator,
-    newPixels, oldPixels, tmpPixels, pixLength, targetX, targetY, $hl = $('#js-pointer'),
+    newPixels, oldPixels, pixLength, targetX, targetY, $hl = $('#js-pointer'),
     firstFrame = true,
     intervalTime = 100,
     columns, scores, vidWidth = vidEl.width,
     vidHeight = vidEl.height;
+  var oldTotal = 0;
 
   function fireSoundClip(targetx, targety) {
     var area = 0;
     var areaRange = vidWidth / 3;
     if (targetx < areaRange) {
-      area = 'snare';
+      area = 'hihat';
     } else if (targetx < areaRange * 2) {
       area = 'kick';
     } else if (targetx < areaRange * 3) {
-      area = 'hihat';
+      area = 'snare';
     }
 
     window.enterArea.fire({
@@ -86,7 +87,6 @@ $(function() {
 
     oldPixels = newPixels;
     newPixels = canvas.getImageData(0, 0, vidWidth, vidHeight);
-    tmpPixels = canvas.getImageData(0, 0, vidWidth, vidHeight);
 
     // Reinitialize the arrays (look ma, near-0 garbage collection)
     for (i = 0; i < vidWidth; i++) {
@@ -136,7 +136,6 @@ $(function() {
       // 0-255 , 3 * 255
       if (total > 16 && (r > 16 || g > 16 || b > 16)) {
         //IT'S DIFFERENT!
-        tmpPixels.data[i * 4 + 1] = 1; //total;      //it's green, make pixel invisible
         columns[left][top] = 1; //give it a columns value of 1
       } else {
         //NOT DIFFERENT
@@ -284,7 +283,7 @@ $(function() {
   function scoreByScan() {
     var nCol, mCol, nRow, startCol, preDipCol, colVal, numCols, column, score, highColVal = 0,
       highScore = 0,
-      lowestHighScore = 3000,
+      lowestHighScore = 5000,
       crop = 0 // to crop out the noise that way overinflates
       ,
       weightedScore, connectedVal, highConnVal;
@@ -362,8 +361,6 @@ $(function() {
         if (score > threshold) {
           if (preDipCol) {
             for (mCol = preDipCol; mCol < nCol; mCol += 1) {
-              tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 0] = 255;
-              tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 1] = 0;
             }
             preDipCol = 0;
             startCol = 0;
@@ -391,25 +388,18 @@ $(function() {
         }
 
         weightedScore = Math.floor((score / highScore) * 512);
-
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 0] = 255 - weightedScore;
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 1] = 255 - score;
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 2] = 0;
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 3] = 0;
-        tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 3] = 255 - weightedScore;
       }
     }
 
 
     if (highScore > lowestHighScore) {
-      fireSoundClip(targetX, targetY);
+      _.throttle(fireSoundClip(targetX, targetY),200);
     }
   }
 
   function draw() {
     getDifference();
       scoreByScan();
-    window.app.showOverLay && canvas.putImageData(tmpPixels, 0, 0);
   }
 
  
