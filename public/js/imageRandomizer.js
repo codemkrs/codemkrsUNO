@@ -1,20 +1,17 @@
 $(function(){
 
-var body = $('body');
-var images = $('.visualEffects');
+var container = $('.video-container');
+var images = $('.visualEffect');
 
 window.enterArea.add(function () {
-	var random = function(max) {
-		return Math.floor(Math.random()*max)
-	};
-	var randomImage = images.eq(random(images.length) );
-	var xBounds = body.width() - randomImage.width();
-	var yBounds = body.height() - randomImage.height();
-	var xCoord = random(xBounds);
-	var yCoord = random(yBounds);
+	var randomImage = images.eq( _.random(0, images.length) );
+	var xBounds = container.width() - randomImage.width();
+	var yBounds = container.height() - randomImage.height();
+	var xCoord = _.random(0, xBounds);
+	var yCoord = _.random(0, yBounds);
 
-	$('.visualEffects').css({position:absolute, left:xCoord, top:yCoord});
-	randomImage.appendTo(body).show().fadeOut(200);
+	randomImage.css({left:xCoord, top:yCoord});
+	randomImage.show().fadeOut(_.random(250, 500));
 });
 
 })

@@ -36,6 +36,7 @@
         <div class="container">
             <h1>Head-bobble Drum Machine</h1>
             <div class="row-fluid text-center">
+
               <div class="video-container">
                 <div class='video'>
                   <video style="display:none;" id="js-video" width="320" height="240">
@@ -44,8 +45,17 @@
                   height="240">
                   </canvas>
                 </div>
+
+                <div class="visualEffect crunch" style="display: none"></div>
+                <div class="visualEffect kapow" style="display: none"></div>
+                <div class="visualEffect sock" style="display: none"></div>
+                <div class="visualEffect thwack" style="display: none"></div>
+                <div class="visualEffect zap" style="display: none"></div>
+                <div class="visualEffect zlonk" style="display: none"></div>
+
               </div>
             </div>
+
             <div class="row-fluid text-center">
               <button style="display:none;" type="button" class="js-toggle-video btn btn-inverse btn-small">
                   Toggle Video Feed
@@ -69,20 +79,13 @@
 
             </div>
         </div>
-        <div class="images">
-          <div class="visualEffects crunch" style="display: none"></div>
-          <div class="visualEffects kapow" style="display: none"></div>
-          <div class="visualEffects sock" style="display: none"></div>
-          <div class="visualEffects thwack" style="display: none"></div>
-          <div class="visualEffects zap" style="display: none"></div>
-          <div class="visualEffects zlonk" style="display: none"></div>
-        </div>
         <footer>
           <div class="pull-right"><button class="btn theme-switcher">BG</button></div>
         </footer>
         <script src="http://code.jquery.com/jquery-2.0.0.js"> </script>
-        <script type="text/javascript" src="/js/tracking.js"> </script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
+        <script type="text/javascript" src="/js/tracking.js"> </script>
+        <script src="/js/imageRandomizer.js"></script>
         <script>
         window.enterArea.add(function(x){
           console.log("area", x);
