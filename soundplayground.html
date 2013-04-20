@@ -2,6 +2,10 @@
 <head>
 	<title>Sound Playground</title>
 	<style>
+	.label {
+		width: 10em;
+		display: inline-block;
+	}
 	.play {
 	    display:inline-block;
 	    margin:5px;
@@ -47,7 +51,7 @@
 $(function(){
     var contextProto = window.AudioContext || window.webkitAudioContext || (function(){ throw "uh oh, no audioContext" })(), 
     	context = new contextProto(),
-        soundSource, 
+        sounds = {}, 
         soundBuffer;
 
     function getSound(url) {
@@ -59,41 +63,40 @@ $(function(){
 	        request.onerror = function(){ d.reject(request.response, request); }
         	request.send();
     	});
-    }
-    $('.play').click(function(){
-    	var url = '/public/audio/'+$(this).data('sound');
-    	getSound(url).done(audioGraph)
-    })
-    function startSound() {
-    	getSound(url).done(audioGraph)
-    }
+    }    // function startSound() {
+    // 	getSound(url).done(audioGraph)
+    // }
 
-    function playSound() {
-        soundSource.noteOn(context.currentTime);
-    }
 
-    function stopSound() {
-        soundSource.noteOff(context.currentTime);
-    }
+    // function playSound() {
+    //     sounds.noteOn(context.currentTime);
+    // }
+
+    // function stopSound() {
+    //     sounds.noteOff(context.currentTime);
+    // }
 
 
     // This is the code we are interested in
-    function audioGraph(audioData) {
+    function audioGraph(sound) { return function(audioData) {
         // create a sound source
-        soundSource = context.createBufferSource();
+        sounds[sound] = audioData;
+    } }
 
-        // The Audio Context handles creating source buffers from raw binary
-        soundBuffer = context.createBuffer(audioData, true/* make mono */);
-      
-        // Add the buffered data to our object
-        soundSource.buffer = soundBuffer;
-
-        // Plug the cable from one thing to the other
-        soundSource.connect(context.destination);
-
-        // Finally
-        playSound(soundSource);
-    }
+    $('.play').each(function(){
+    	var sound = $(this).data('sound');
+    	getSound('/public/audio/'+sound).done( audioGraph(sound) );
+    })
+    $('.play').click(function(){
+    	var sound = $(this).data('sound');
+    	if(!sounds[sound])
+    		return console.log(sound+" not yet loaded");
+        var ss = context.createBufferSource();
+        ss.buffer = context.createBuffer(sounds[sound], true/* make mono */)
+        ss.connect(context.destination);
+        ss.connect(context.destination);
+    	ss.noteOn(0);
+    })
 
 });
 </script>
