@@ -1,17 +1,24 @@
 $(function(){
 
-var container = $('.video-container');
-var images = $('.visualEffect');
-
+var  container = $('.video-container')
+	,video = $('.video', container)
+	,videoContainerWidth = container.width()
+	,containerPadding = parseInt( container.css('padding'), 10)
+	,halfPadding = containerPadding / 2
+	,images = $('.visualEffect')
+	,orientOn = _.pairs({'top': 'left', 'right': 'top', 'bottom': 'left', 'left':'top'})
+	;
 window.enterArea.add(function () {
 	var randomImage = images.eq( _.random(0, images.length) );
-	var xBounds = container.width() - randomImage.width();
-	var yBounds = container.height() - randomImage.height();
-	var xCoord = _.random(0, xBounds);
-	var yCoord = _.random(0, yBounds);
+	randomImage.hide().css({ left: 'auto', top: 'auto', right: 'auto', bottom: 'auto'}); //reset
 
-	randomImage.css({left:xCoord, top:yCoord});
-	randomImage.show().fadeOut(_.random(250, 500));
+	var orientation = orientOn[_.random(3)];
+	var position = {}
+	position[orientation[0]] = _.random(halfPadding);
+	position[orientation[1]] = _.random(videoContainerWidth)
+
+	console.log(position);
+	randomImage.css(position).show().fadeOut(_.random(250, 500));
 });
 
 })

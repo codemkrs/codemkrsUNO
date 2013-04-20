@@ -36,4 +36,5 @@
   padding: 50px;
   display: inline-block;
   position: relative;
-  overflow: hidden; }
+  overflow: hidden;
+  margin-bottom: 2em; }
