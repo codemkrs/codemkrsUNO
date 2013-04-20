@@ -1,6 +1,9 @@
-(function () {
-	var body = $('body');
-	var images = $('.visualEffects');
+$(function(){
+
+var body = $('body');
+var images = $('.visualEffects');
+
+window.enterArea.add(function () {
 	var random = function(max) {
 		return Math.floor(Math.random()*max)
 	};
@@ -12,4 +15,6 @@
 
 	$('.visualEffects').css({position:absolute, left:xCoord, top:yCoord});
 	randomImage.appendTo(body).show().fadeOut(200);
-})()
+});
+
+})

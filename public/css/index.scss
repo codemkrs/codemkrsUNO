@@ -2,24 +2,43 @@
  * Stylesheet for whatever the fuck we're calling this
  */
 .visualEffects {
-	width: 32px;
-	height: 32px;
+	width: 64px;
+	height: 64px;
+	background-size: 64px 64px;
+	background-repeat:no-repeat;
 }
 
 .visualEffects.crunch {
+	background-image: url('../img/crunch.png')
 }
 
 .visualEffects.kapow {
+	background-image: url('../img/kapow.png')
 }
 
 .visualEffects.sock {
+	background-image: url('../img/sock.png')
 }
 
 .visualEffects.thwack {
+	background-image: url('../img/thwack.png')
 }
 
 .visualEffects.zap {
+	background-image: url('../img/zap.png')
 }
 
 .visualEffects.zlonk {
+	background-image: url('../img/zlonk.png')
+}
+
+.video {
+	width: 320px;
+	height: 240px;
+	border: 1px solid grey;
+}
+.video-container {
+	border: 1px solid grey;
+	padding: 50px;
+	display: inline-block;
 }
