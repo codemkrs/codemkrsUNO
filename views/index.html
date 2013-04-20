@@ -8,9 +8,10 @@
     <link href="/css/united-bootstrap.min.css" rel="stylesheet" type="text/css" id="bootstrap-style">
     <link href="/css/index.css" rel="stylesheet" type="text/css">
     <script>
-    window.suppressVideo = true;
+    window.suppressVideo = false;
     window.app = window.app ||  {};
     window.app.areas = [0,1,2];
+    window.app.showOverLay = false;
     </script>
     <body style="zoom: 1;">
         <div class="navbar">
@@ -103,6 +104,7 @@
               </div>
 
             </div>
+
         </div>
         <footer>
           <div class="pull-right"><button class="btn theme-switcher">BG</button></div>
@@ -110,6 +112,7 @@
         <script src="http://code.jquery.com/jquery-2.0.0.js"> </script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
         <script type="text/javascript" src="/js/tracking.js"> </script>
+        <script type="text/javascript" src="/js/sounds.js"> </script>
         <script src="/js/imageRandomizer.js"></script>
         <script>
         window.enterArea.add(function(x){

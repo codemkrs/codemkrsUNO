@@ -2,31 +2,31 @@ window.enterArea = window.enterArea || $.Callbacks();
 
 $(function() {
   "use strict";
-
+  var throttleAmmount = 600;
   var vidEl = document.querySelector("#js-video"),
     canvas = document.querySelector('#js-snapshot').getContext('2d'),
     n = window.navigator,
-    newPixels, oldPixels, tmpPixels, pixLength, targetX, targetY, $hl = $('#js-pointer'),
+    newPixels, oldPixels, pixLength, targetX, targetY, $hl = $('#js-pointer'),
     firstFrame = true,
     intervalTime = 100,
     columns, scores, vidWidth = vidEl.width,
     vidHeight = vidEl.height;
+  var oldTotal = 0;
 
   function fireSoundClip(targetx, targety) {
     var area = 0;
     var areaRange = vidWidth / 3;
     if (targetx < areaRange) {
-      console.log('area 1');
-      area = 1;
+      area = 'hihat';
     } else if (targetx < areaRange * 2) {
-      console.log('area 2');
-      area = 2;
+      area = 'kick';
     } else if (targetx < areaRange * 3) {
-      console.log('area 3');
-      area = 3;
+      area = 'snare';
     }
+
     window.enterArea.fire({
-      message: area,
+      type: "motionTrackEvent",
+      sound: area,
       time: new Date()
     });
   }
@@ -87,7 +87,6 @@ $(function() {
 
     oldPixels = newPixels;
     newPixels = canvas.getImageData(0, 0, vidWidth, vidHeight);
-    tmpPixels = canvas.getImageData(0, 0, vidWidth, vidHeight);
 
     // Reinitialize the arrays (look ma, near-0 garbage collection)
     for (i = 0; i < vidWidth; i++) {
@@ -137,7 +136,6 @@ $(function() {
       // 0-255 , 3 * 255
       if (total > 16 && (r > 16 || g > 16 || b > 16)) {
         //IT'S DIFFERENT!
-        tmpPixels.data[i * 4 + 1] = 1; //total;      //it's green, make pixel invisible
         columns[left][top] = 1; //give it a columns value of 1
       } else {
         //NOT DIFFERENT
@@ -147,6 +145,7 @@ $(function() {
     }
   }
 
+  //GM - this isn't being used
   function scoreByNeighbors() {
     //NOW LET'S CALCULATE EACH SCORE BY WAY OF A NEIGHBORHOOD OPERATION
     /*
@@ -279,7 +278,7 @@ $(function() {
     targetX = targetX / targetCount;
     targetY = targetY / targetCount;
 
-    fireSoundClip(targetX, targetY);
+    _.throttle(fireSoundClip(targetX, targetY), throttleAmmount);
   }
 
   function scoreByScan() {
@@ -347,13 +346,14 @@ $(function() {
       }
     }
 
+
     // smooth the scores
     for (nCol = crop; nCol < vidWidth - crop; nCol += 1) {
       column = scores[nCol];
       for (nRow = (vidHeight - crop) - 2; nRow >= crop; nRow -= 1) {}
     }
 
-    var threshold = 1000;
+    var threshold = 1500;
     for (nCol = crop; nCol < vidWidth - crop; nCol += 1) {
       column = scores[nCol];
       startCol = 0;
@@ -363,8 +363,6 @@ $(function() {
         if (score > threshold) {
           if (preDipCol) {
             for (mCol = preDipCol; mCol < nCol; mCol += 1) {
-              tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 0] = 255;
-              tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 1] = 0;
             }
             preDipCol = 0;
             startCol = 0;
@@ -392,32 +390,85 @@ $(function() {
         }
 
         weightedScore = Math.floor((score / highScore) * 512);
-
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 0] = 255 - weightedScore;
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 1] = 255 - score;
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 2] = 0;
-        //tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 3] = 0;
-        tmpPixels.data[(((vidWidth * nRow) + nCol) * 4) + 3] = 255 - weightedScore;
       }
     }
 
-    console.log('HighColVal', highColVal);
-    console.log('HighScore', highScore);
 
-    if (highScore > lowestHighScore) {
-      positionPointer(targetX, targetY);
+    if ( (highScore > lowestHighScore) && isProbablyMovingDown() ) {
+      _.throttle(fireSoundClip(targetX, targetY),200);
     }
+  }
+
+
+  var samplingSize = 1000;
+  var movingUpThreshold = 1.001;
+  var resultsToKeep = 15;
+  var movingUpRateThreshold = -1;
+
+  var prevCenterOfMassY = 0;
+  function sampleMotion() {
+    var currCenterOfMassY = centerOfMassY(prevSampling);
+    if(currCenterOfMassY > movingUpThreshold*prevCenterOfMassY) //increase as moving down
+      guessMovingDown(1);
+    else
+      guessMovingDown(0);
+    selectSampling();
+    prevCenterOfMassY = centerOfMassY(prevSampling);
+    if(!isFinite(prevCenterOfMassY))
+      prevCenterOfMassY = 0;
+  }
+
+  var prevSampling = [];
+  function selectSampling() {
+    prevSampling.length = 0;
+    for (var i = samplingSize - 1; i >= 0; i--) 
+      selectSample();
+  }
+  function selectSample() {
+    var x,y;
+    for(var find1Attempts = 100; find1Attempts >= 0; find1Attempts--){
+      x = _.random(0, vidWidth-1);
+      y = _.random(0, vidHeight-1);
+      if(columns[y][x])
+        prevSampling.push( {x:x,y:y} );
+    }
+  }
+
+  var movementGuesses = [];
+  function guessMovingDown(down) {
+    movementGuesses.push(down);
+    if(movementGuesses.length>resultsToKeep)
+      movementGuesses.shift();
+  }
+
+  function isProbablyMovingDown(){
+    //console.log("guesses", movementGuesses, sum(movementGuesses)/movementGuesses.length);
+    return sum(movementGuesses)/movementGuesses.length > movingUpRateThreshold;
+  }
+
+  function sum(arr) {
+    var total = 0;
+    for(var i=arr.length-1;i>=0;i--)
+      total += arr[i];
+    return total;
+  }
+  function centerOfMassY(sampling) {
+    var valuesAtSampling = [];
+    for(var i = sampling.length-1; i>=0;i--) {
+      var s = sampling[i];
+      if(columns[s.y][s.x])
+        valuesAtSampling.push( s.y );
+    }
+    return sum(valuesAtSampling)/valuesAtSampling.length
   }
 
   function draw() {
     getDifference();
-    if (true) {
-      scoreByNeighbors();
-    } else {
-      scoreByScan();
-    }
-    canvas.putImageData(tmpPixels, 0, 0);
+    scoreByScan();
+    sampleMotion();
   }
+
+ 
 
 
 });

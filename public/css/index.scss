@@ -32,6 +32,10 @@
 .visualEffect.zlonk {
 	background-image: url('../img/zlonk.png')
 }
+canvas {
+	transform: rotateY(180deg);
+-webkit-transform: rotateY(180deg);
+}
 
 .video {
 	width: 320px;
@@ -46,3 +50,4 @@
 	overflow: hidden;
 	margin-bottom: 2em;
 }
+

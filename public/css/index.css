@@ -9,22 +9,26 @@
   position: absolute; }
 
 .visualEffect.crunch {
-  background-image: url('../img/crunch.png'); }
+  background-image: url("../img/crunch.png"); }
 
 .visualEffect.kapow {
-  background-image: url('../img/kapow.png'); }
+  background-image: url("../img/kapow.png"); }
 
 .visualEffect.sock {
-  background-image: url('../img/sock.png'); }
+  background-image: url("../img/sock.png"); }
 
 .visualEffect.thwack {
-  background-image: url('../img/thwack.png'); }
+  background-image: url("../img/thwack.png"); }
 
 .visualEffect.zap {
-  background-image: url('../img/zap.png'); }
+  background-image: url("../img/zap.png"); }
 
 .visualEffect.zlonk {
-  background-image: url('../img/zlonk.png'); }
+  background-image: url("../img/zlonk.png"); }
+
+canvas {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); }
 
 .video {
   width: 320px;

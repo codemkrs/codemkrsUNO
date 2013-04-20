@@ -8,7 +8,7 @@ var  container = $('.video-container')
 	,images = $('.visualEffect')
 	,orientOn = _.pairs({'top': 'left', 'right': 'top', 'bottom': 'left', 'left':'top'})
 	;
-window.enterArea.add(function () {
+window.enterArea.add(_.throttle(function () {
 	var randomImage = images.eq( _.random(0, images.length) );
 	randomImage.hide().css({ left: 'auto', top: 'auto', right: 'auto', bottom: 'auto'}); //reset
 
@@ -17,8 +17,7 @@ window.enterArea.add(function () {
 	position[orientation[0]] = _.random(halfPadding);
 	position[orientation[1]] = _.random(videoContainerWidth)
 
-	console.log(position);
-	randomImage.css(position).show().fadeOut(_.random(250, 500));
-});
+	randomImage.css(position).show().fadeOut(_.random(250, 800));
+}, 250));
 
 })
