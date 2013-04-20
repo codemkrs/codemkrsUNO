@@ -66,8 +66,9 @@ $(function() {
       $('#js-pointer').fadeIn();
     });
   }
-  $('body').on('click', '.js-allow-video', initialize);
-  $('body').on('click', '.js-toggle-video', function() {
+
+  suppressVideo || $('body').on('click', '.js-allow-video', initialize);
+  suppressVideo || $('body').on('click', '.js-toggle-video', function() {
     $('#js-snapshot').slideToggle();
   });
 
