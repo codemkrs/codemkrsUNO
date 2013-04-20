@@ -2,7 +2,7 @@ window.enterArea = window.enterArea || $.Callbacks();
 
 $(function() {
   "use strict";
-
+  var throttleAmmount = 600;
   var vidEl = document.querySelector("#js-video"),
     canvas = document.querySelector('#js-snapshot').getContext('2d'),
     n = window.navigator,
@@ -16,13 +16,10 @@ $(function() {
     var area = 0;
     var areaRange = vidWidth / 3;
     if (targetx < areaRange) {
-      console.log('area 1');
       area = 'snare';
     } else if (targetx < areaRange * 2) {
-      console.log('area 2');
       area = 'kick';
     } else if (targetx < areaRange * 3) {
-      console.log('area 3');
       area = 'hihat';
     }
 
@@ -281,13 +278,13 @@ $(function() {
     targetX = targetX / targetCount;
     targetY = targetY / targetCount;
 
-    fireSoundClip(targetX, targetY);
+    _.throttle(fireSoundClip(targetX, targetY), throttleAmmount);
   }
 
   function scoreByScan() {
     var nCol, mCol, nRow, startCol, preDipCol, colVal, numCols, column, score, highColVal = 0,
       highScore = 0,
-      lowestHighScore = 1500,
+      lowestHighScore = 3000,
       crop = 0 // to crop out the noise that way overinflates
       ,
       weightedScore, connectedVal, highConnVal;
@@ -355,7 +352,7 @@ $(function() {
       for (nRow = (vidHeight - crop) - 2; nRow >= crop; nRow -= 1) {}
     }
 
-    var threshold = 1000;
+    var threshold = 10000;
     for (nCol = crop; nCol < vidWidth - crop; nCol += 1) {
       column = scores[nCol];
       startCol = 0;
@@ -403,22 +400,16 @@ $(function() {
       }
     }
 
-    console.log('HighColVal', highColVal);
-    console.log('HighScore', highScore);
 
     if (highScore > lowestHighScore) {
-      positionPointer(targetX, targetY);
+      fireSoundClip(targetX, targetY);
     }
   }
 
   function draw() {
     getDifference();
-    if (true) {
-      scoreByNeighbors();
-    } else {
       scoreByScan();
-    }
-    canvas.putImageData(tmpPixels, 0, 0);
+    window.app.showOverLay && canvas.putImageData(tmpPixels, 0, 0);
   }
 
  
