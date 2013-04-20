@@ -200,6 +200,10 @@
                 <input type="checkbox" id="lefthanded" class="control">
                 <span class="label">Lefthanded</span>
             </label></li>
+            <li><label>
+                <input type="checkbox" id="toms" class="control">
+                <span class="label">Use Toms</span>
+            </label></li>
         </ul>
         </div>
         <script src="http://code.jquery.com/jquery-2.0.0.js">
@@ -267,6 +271,10 @@
 
                 $('#lefthanded').on('change', function(){
                     window.app.soundFileTransform = $(this).prop('checked') ? _.identity : function(x) { return 2-x };
+                }).trigger('change');
+
+                $('#toms').on('change', function(){
+                    window.app.soundFileTransform2 = $(this).prop('checked') ? _.identity : function(x) { return 3+x };
                 }).trigger('change');
             })
 
