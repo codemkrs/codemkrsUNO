@@ -280,21 +280,17 @@ $(function() {
   //      record false mean
   //   else zero out queue 
 
-  var tapLog = function(msg, val) {
-    console.log(msg, val);
-    return val;
-  }
 
   var recentMeans = []
   function isChangedToUpstroke() {
     if(!isMoving(-1) )
       return false;
-    return tapLog("wasRecentlyMovingDownward", wasRecentlyMovingDownward());
+    return wasRecentlyMovingDownward();
   }
 
   var ducky = {
-     amountDifferentToBeMoving: 4
-    ,numberToSampleForDeltaToBeMoving: 3
+     amountDifferentToBeMoving: 2
+    ,numberToSampleForDeltaToBeMoving: 5
     ,recentMeansSize: 15
     ,numberToSampleForRecentlyMovingDownward: 4
   }
@@ -306,19 +302,22 @@ $(function() {
     var mustExceed = direction * ducky.amountDifferentToBeMoving + thisMean;
     var toCompareTo = recentMeans.slice( indexOfItem-ducky.numberToSampleForDeltaToBeMoving-1, indexOfItem);
     var necessaryForConcensus = ducky.numberToSampleForDeltaToBeMoving/2;
-    return most(toCompareTo, necessaryForConcensus, function(x){ return x.value > mustExceed});
+    var comparison = direction == -1 ? function(x){ return x.value > mustExceed} : function(x){ return x.value < mustExceed};
+    return most(toCompareTo, necessaryForConcensus, comparison);
   }
 
   function wasRecentlyMovingDownward() {
-    var recentMotion = recentMeans.slice(-1*ducky.numberToSampleForRecentlyMovingDownward-1, -1);
+    var lowerBound = recentMeans.length-ducky.numberToSampleForRecentlyMovingDownward-1;
+    if(lowerBound < 0) lowerBound = 0;
+    var recentMotion = !recentMeans.length ? [] : _.range(lowerBound, recentMeans.length -1);
     var necessaryForConcensus = ducky.numberToSampleForRecentlyMovingDownward/2;
-    return most(recentMotion, necessaryForConcensus, function(x, i){ return wasMoving(+1, i); });
+    return most(recentMotion, necessaryForConcensus, function(x){ return wasMoving(+1, x); });
   }
 
   function most(arr, necessaryForConcensus, test) {
     var voteExceeded = 0;
     for(var i = 0; i<arr.length;i++) {
-      if( test(arr[i], i) ) 
+      if( test(arr[i]) ) 
         voteExceeded+=1;
       if(voteExceeded >= necessaryForConcensus) 
         return true;     
@@ -362,54 +361,11 @@ $(function() {
     if (recentMeans.length > ducky.recentMeansSize) recentMeans.shift();
   }
 
-
-  var prevSampling = [];
-
-  function selectSampling() {
-    prevSampling.length = 0;
-    for (var i = window.app.samplingSize - 1; i >= 0; i--)
-      selectSample();
-  }
-
-  function selectSample() {
-    var x, y;
-    for (var find1Attempts = 100; find1Attempts >= 0; find1Attempts--) {
-      x = _.random(0, vidWidth - 1);
-      y = _.random(0, vidHeight - 1);
-      if (columns[y][x]) prevSampling.push({
-        x: x,
-        y: y
-      });
-    }
-  }
-
-  var movementGuesses = [];
-
-  function guessMovingDown(down) {
-    movementGuesses.push(down);
-    if (movementGuesses.length > window.app.resultsToKeep) movementGuesses.shift();
-  }
-
-  function isProbablyMovingDown() {
-    //console.log("guesses", movementGuesses, sum(movementGuesses)/movementGuesses.length);
-    return !window.app.movingDownRateThreshold 
-          || ( sum(movementGuesses) / movementGuesses.length > window.app.movingDownRateThreshold );
-  }
-
   function sum(arr) {
     var total = 0;
     for (var i = arr.length - 1; i >= 0; i--)
     total += arr[i];
     return total;
-  }
-
-  function centerOfMassY(sampling) {
-    var valuesAtSampling = [];
-    for (var i = sampling.length - 1; i >= 0; i--) {
-      var s = sampling[i];
-      if (columns[s.y][s.x]) valuesAtSampling.push(s.y);
-    }
-    return sum(valuesAtSampling) / valuesAtSampling.length
   }
 
   function draw() {
