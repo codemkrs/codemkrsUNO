@@ -63,23 +63,9 @@ $(function(){
 	        request.onerror = function(){ d.reject(request.response, request); }
         	request.send();
     	});
-    }    // function startSound() {
-    // 	getSound(url).done(audioGraph)
-    // }
-
-
-    // function playSound() {
-    //     sounds.noteOn(context.currentTime);
-    // }
-
-    // function stopSound() {
-    //     sounds.noteOff(context.currentTime);
-    // }
-
-
-    // This is the code we are interested in
+    }    
+    
     function audioGraph(sound) { return function(audioData) {
-        // create a sound source
         sounds[sound] = audioData;
     } }
 
