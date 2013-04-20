@@ -1,0 +1,90 @@
+<html>
+<head>
+	<title>Sound Playground</title>
+	<style>
+	.label {
+		width: 10em;
+		display: inline-block;
+	}
+	.play {
+	    display:inline-block;
+	    margin:5px;
+	    width: 24px;
+	    height: 32px;
+	    background-repeat: no-repeat;
+	    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAgCAYAAAAIXrg4AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAMZJREFUeNq0lt0NgzAMhIPlfWAR1BXYpDBSxSCFiYr70CqKUH6cO0t+SEC++xxkIvP8eFuOgRRiOVkeJvJkCAxW+BOtD8tl318nkiAOOE1KENA0knkGockRQGik8j03TS2Bm0YcbW2i8RA00UjnZ16k6SUo0ghw7NzSIAluaSRw4k/DEqCcQdqiyVq0KaH4+i38WyjjYONNZbhGChRHhTJc9wo0jWtluPYIuH+ZynBdKwC5tijDdU4AfnVUhutUAO46jkuAAQD+jXZOTODXVwAAAABJRU5ErkJggg==);
+	    text-indent:-200px;
+	}
+	.stop {
+	    display:inline-block;
+	    margin:5px;
+	    width: 32px;
+	    height: 32px;
+	    background-repeat: no-repeat;
+	    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACxJREFUeNrszUERAAAEADD0c/q3UYLfVmDZPfGp4plAIBAIBAKBQCC4sgIMAJggASlttpE8AAAAAElFTkSuQmCC);
+	    text-indent:-200px;
+	}
+	p:hover {
+	    cursor:pointer;
+	    opacity:0.8;
+	}
+
+	</style>
+</head>
+<body>
+
+<ul>
+	<li>
+		<label><span class="label">Kick</span>
+		<button class="play" data-sound="A_KICK_02.wav"></button></label></li>
+	<li>
+		<label><span class="label">Snare</span>
+		<button class="play" data-sound="B_SNARE_2.wav"></button></label></li>
+	<li>
+		<label><span class="label">Hat</span>
+		<button class="play" data-sound="G_HAT_9.wav"></button></label></li>
+</ul>
+
+<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
+<script>
+'use strict'
+$(function(){
+    var contextProto = window.AudioContext || window.webkitAudioContext || (function(){ throw "uh oh, no audioContext" })(), 
+    	context = new contextProto(),
+        sounds = {}, 
+        soundBuffer;
+
+    function getSound(url) {
+    	return $.Deferred(function(d) {
+	        var request = new XMLHttpRequest();
+	        request.open("GET", url, true);
+	        request.responseType = "arraybuffer";
+	        request.onload = function(){ d.resolve(request.response, request); }
+	        request.onerror = function(){ d.reject(request.response, request); }
+        	request.send();
+    	});
+    }    
+    
+    function audioGraph(sound) { return function(audioData) {
+        sounds[sound] = audioData;
+    } }
+
+    $('.play').each(function(){
+    	var sound = $(this).data('sound');
+    	getSound('/public/audio/'+sound).done( audioGraph(sound) );
+    })
+    $('.play').click(function(){
+    	var sound = $(this).data('sound');
+    	if(!sounds[sound])
+    		return console.log(sound+" not yet loaded");
+        var ss = context.createBufferSource();
+        ss.buffer = context.createBuffer(sounds[sound], true/* make mono */)
+        ss.connect(context.destination);
+        ss.connect(context.destination);
+    	ss.noteOn(0);
+    })
+
+});
+</script>
+</body>
+</html>
