@@ -28,28 +28,27 @@
 	</style>
 </head>
 <body>
-  <p class="play">Play</p>
-  <p class="stop">Stop</p>
+
+<ul>
+	<li>
+		<label><span class="label">Kick</span>
+		<button class="play" data-sound="A_KICK_02.wav"></button></label></li>
+	<li>
+		<label><span class="label">Snare</span>
+		<button class="play" data-sound="B_SNARE_2.wav"></button></label></li>
+	<li>
+		<label><span class="label">Hat</span>
+		<button class="play" data-sound="G_HAT_9.wav"></button></label></li>
+</ul>
 
 <script src="http://code.jquery.com/jquery-1.9.0.js"></script>
 <script>
-	$(function(){
-    var context, 
+'use strict'
+$(function(){
+    var contextProto = window.AudioContext || window.webkitAudioContext || (function(){ throw "uh oh, no audioContext" })(), 
+    	context = new contextProto(),
         soundSource, 
-        soundBuffer,
-        url = 'http://thelab.thingsinjars.com/web-audio-tutorial/hello.mp3';
-
-    // Step 1 - Initialise the Audio Context
-    // There can be only one!
-    function init() {
-        if (typeof AudioContext !== "undefined") {
-            context = new AudioContext();
-        } else if (typeof webkitAudioContext !== "undefined") {
-            context = new webkitAudioContext();
-        } else {
-            throw new Error('AudioContext not supported. :(');
-        }
-    }
+        soundBuffer;
 
     function getSound(url) {
     	return $.Deferred(function(d) {
@@ -61,6 +60,10 @@
         	request.send();
     	});
     }
+    $('.play').click(function(){
+    	var url = '/public/audio/'+$(this).data('sound');
+    	getSound(url).done(audioGraph)
+    })
     function startSound() {
     	getSound(url).done(audioGraph)
     }
@@ -70,13 +73,8 @@
     }
 
     function stopSound() {
-        // stop the source now
         soundSource.noteOff(context.currentTime);
     }
-
-    // Events for the play/stop bottons
-    document.querySelector('.play').addEventListener('click', startSound);
-    document.querySelector('.stop').addEventListener('click', stopSound);
 
 
     // This is the code we are interested in
@@ -97,9 +95,7 @@
         playSound(soundSource);
     }
 
-
-    init();
-	});
+});
 </script>
 </body>
 </html>
