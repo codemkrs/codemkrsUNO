@@ -393,18 +393,18 @@ $(function() {
       }
     }
 
-
     if ((highScore > lowestHighScore) && isProbablyMovingDown()) {
-      _.throttle(fireSoundClip(targetX, targetY), 200);
+      fireSoundClip(targetX, targetY);
     }
   }
 
+  var prevCenterOfMassY = 0;
   function sampleMotion() {
     var currCenterOfMassY = centerOfMassY(prevSampling);
-    if (currCenterOfMassY > movingUpThreshold * prevCenterOfMassY) //increase as moving down
-    guessMovingDown(1);
+    if (currCenterOfMassY > window.app.movingDownThreshold * prevCenterOfMassY) //increase is moving down
+      guessMovingDown(1);
     else guessMovingDown(0);
-    selectSampling();
+      selectSampling();
     prevCenterOfMassY = centerOfMassY(prevSampling);
     if (!isFinite(prevCenterOfMassY)) prevCenterOfMassY = 0;
   }
@@ -413,8 +413,8 @@ $(function() {
 
   function selectSampling() {
     prevSampling.length = 0;
-    for (var i = samplingSize - 1; i >= 0; i--)
-    selectSample();
+    for (var i = window.app.samplingSize - 1; i >= 0; i--)
+      selectSample();
   }
 
   function selectSample() {
@@ -433,12 +433,12 @@ $(function() {
 
   function guessMovingDown(down) {
     movementGuesses.push(down);
-    if (movementGuesses.length > resultsToKeep) movementGuesses.shift();
+    if (movementGuesses.length > window.app.resultsToKeep) movementGuesses.shift();
   }
 
   function isProbablyMovingDown() {
     //console.log("guesses", movementGuesses, sum(movementGuesses)/movementGuesses.length);
-    return sum(movementGuesses) / movementGuesses.length > movingUpRateThreshold;
+    return sum(movementGuesses) / movementGuesses.length > window.app.movingDownRateThreshold;
   }
 
   function sum(arr) {
@@ -459,7 +459,7 @@ $(function() {
 
   function draw() {
     getDifference();
-    scoreByScan();
+    window.app.movingDownRateThreshold && scoreByScan();
     sampleMotion();
   }
 });

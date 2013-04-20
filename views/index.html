@@ -7,18 +7,14 @@
             Welcome to Airdrumist
         </title>
     </head>
-    <link href="/css/united-bootstrap.min.css" rel="stylesheet" type="text/css"
-    id="bootstrap-style">
     <link href="/css/jquery-ui-1.10.2.custom.min.css" rel="stylesheet" type="text/css">
-
-    <link href="/css/index.css" rel="stylesheet" type="text/css">
-    <script>
+    <link href="/css/united-bootstrap.min.css" rel="stylesheet" type="text/css" id="bootstrap-style">
     <link href="/css/index.css" rel="stylesheet" type="text/css">
     <script>
         window.suppressVideo = false;
-    window.app = window.app || {};
-    window.app.areas = [0, 1, 2];
-    window.app.showOverLay = false;
+        window.app = window.app || {};
+        window.app.areas = [0, 1, 2];
+        window.app.showOverLay = false;
     </script>
     
     <body style="zoom: 1;">
@@ -72,36 +68,6 @@
                     <div class="visualEffect zlonk" style="display: none">
                     </div>
                 </div>
-                <ul id='sliders'>
-                    <li>
-                        <div class='slider' data-var="samplingSize">
-                        </div>
-                        <div class='Label'>
-                            Sampling Size
-                        </div>
-                    </li>
-                    <li>
-                        <div class='slider' data-var="movingUpThreshold">
-                        </div>
-                        <div class='Label'>
-                            Moving Up Threshold
-                        </div>
-                    </li>
-                    <li>
-                        <div class='slider' data-var="resultsToKeep">
-                        </div>
-                        <div class='Label'>
-                            Result Set Size
-                        </div>
-                    </li>
-                    <li>
-                        <div class='slider' data-var="movingUpRateThreshold">
-                        </div>
-                        <div class='Label'>
-                            Moving Up Rate Threshold
-                        </div>
-                    </li>
-                </ul>
             </div>
             <div class="row-fluid text-center">
                 <button style="display:none;" type="button" class="js-toggle-video btn btn-inverse btn-small">
@@ -195,6 +161,31 @@
                 </button>
             </div>
         </footer>
+        <div id='runtime-controls'>
+            <h4>Runtime Controls</h4>
+            <ul>
+            <li>
+                <div class='slider' data-slidervar="samplingSize" data-min="500" data-max="2000" data-step="100" data-value="800">
+                </div>
+                <div class='label'> Sampling Size </div>
+            </li>
+            <li>
+                <div class='slider' data-slidervar="movingDownThreshold" data-min="1" data-max="1.4" data-step="0.02" data-value="1">
+                </div>
+                <div class='label'> Moving Down Threshold </div>
+            </li>
+            <li>
+                <div class='slider' data-slidervar="resultsToKeep" data-min="5" data-max="40" data-value="15">
+                </div>
+                <div class='label'> Result Set Size </div>
+            </li>
+            <li>
+                <div class='slider' data-slidervar="movingDownRateThreshold" data-min="0" data-max=".95" data-value=".6" data-step=".2">
+                </div>
+                <div class='label'> Moving Down Rate Threshold </div>
+            </li>
+        </ul>
+        </div>
         <script src="http://code.jquery.com/jquery-2.0.0.js">
                          
         </script>
@@ -229,12 +220,6 @@
                         })
         </script>
         <script>
-                    window.app.samplingSize = 1000;
-            window.app.movingUpThreshold = 1.001;
-            window.app.resultsToKeep = 15;
-            window.app.movingUpRateThreshold = -1;
-
-            var prevCenterOfMassY = 0;
             $(function() {
                 $('.theme-switcher').click(function switchStyle() {
                     var style = $('#bootstrap-style')[0],
@@ -243,19 +228,23 @@
                 });
 
 
-                var sliders = $('li', "#sliders");
-                _.each(sliders, function(slider) {
-                    var uiSlider = $('.slider', slider);
-                    uiSlider.slider({
-                        min: 200,
-                        max: 2000,
-                        value: 1000,
+                $('[data-slidervar]').each(function(i, slider) {
+                    slider = $(this)
+                    var vars = slider.data();
+                    var op = {
+                        min: vars.min&&parseFloat(vars.min, 10),
+                        max: vars.max&&parseFloat(vars.max, 10),
+                        step: vars.step&&parseFloat(vars.step, 10),
+                        value: parseFloat(vars.value, 10),
+                        orientation: 'vertical',
                         slide: function(event, ui) {
-                            window.app[uiSlider.data('var')] = ui.value;
+                            window.app[vars.slidervar] = ui.value;
+                            console.log("current app is", window.app);
                         }
-                    });
-
-                });
+                    };
+                    op.slide(null, {value: op.value});
+                    slider.slider(op);
+                }).trigger('slideslide');
 
             })
 

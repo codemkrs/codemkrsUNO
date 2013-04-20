@@ -97,12 +97,23 @@ canvas {
   transition: 0.1s linear background-image;
   overflow: visible; }
 
-ul {
-  list-style: none; }
-  ul .slider {
-    width: 200px;
-    float: left;
-    margin-left: 15px; }
-  ul .Label {
-    float: left;
-    width: 175px; }
+#runtime-controls {
+  position: fixed;
+  bottom: 0;
+  margin: 0 auto 0 auto;
+  background-color: aliceblue;
+  border-radius: 10px 10px 0 0;
+  padding: 1em;
+  border: 1px solid grey;
+  max-height: 1em;
+  opacity: .5; }
+  #runtime-controls:hover {
+    max-height: 100%;
+    transition-duration: 1000;
+    opacity: 1; }
+  #runtime-controls li {
+    display: inline-block; }
+  #runtime-controls .slider {
+    margin: 0 auto 1em auto; }
+  #runtime-controls .label {
+    padding: .2em; }

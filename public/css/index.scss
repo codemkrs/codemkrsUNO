@@ -105,16 +105,28 @@ canvas {
 
     }
 
-    ul{
-    	list-style: none;
-    	.slider{
-    		width: 200px;
-    		float:left;
-    		margin-left:15px;
-    	}
-    	.Label{
-    		float:left;
-    		width:175px;
-    	}
-    }
+    #runtime-controls {
+    	position: fixed;
+    	bottom: 0;
+    	margin: 0 auto 0 auto;
+		background-color: aliceblue;
+		border-radius: 10px 10px 0 0;
+		padding: 1em;
+		border: 1px solid grey;
+		max-height: 1em;
+		opacity: .5;
 
+		&:hover {
+			max-height: 100%;
+			transition-duration: 1000;
+			opacity: 1;
+		}
+    	li { display: inline-block; }
+
+		.slider{
+			margin: 0 auto 1em auto;
+		}
+		.label{
+			padding: .2em;
+		}
+    }
