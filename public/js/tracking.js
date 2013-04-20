@@ -145,6 +145,7 @@ $(function() {
     }
   }
 
+  //GM - this isn't being used
   function scoreByNeighbors() {
     //NOW LET'S CALCULATE EACH SCORE BY WAY OF A NEIGHBORHOOD OPERATION
     /*
@@ -283,7 +284,7 @@ $(function() {
   function scoreByScan() {
     var nCol, mCol, nRow, startCol, preDipCol, colVal, numCols, column, score, highColVal = 0,
       highScore = 0,
-      lowestHighScore = 5000,
+      lowestHighScore = 1500,
       crop = 0 // to crop out the noise that way overinflates
       ,
       weightedScore, connectedVal, highConnVal;
@@ -345,13 +346,14 @@ $(function() {
       }
     }
 
+
     // smooth the scores
     for (nCol = crop; nCol < vidWidth - crop; nCol += 1) {
       column = scores[nCol];
       for (nRow = (vidHeight - crop) - 2; nRow >= crop; nRow -= 1) {}
     }
 
-    var threshold = 10000;
+    var threshold = 1500;
     for (nCol = crop; nCol < vidWidth - crop; nCol += 1) {
       column = scores[nCol];
       startCol = 0;
@@ -392,14 +394,78 @@ $(function() {
     }
 
 
-    if (highScore > lowestHighScore) {
+    if ( (highScore > lowestHighScore) && isProbablyMovingDown() ) {
       _.throttle(fireSoundClip(targetX, targetY),200);
     }
   }
 
+
+  var samplingSize = 1000;
+  var movingUpThreshold = 1.001;
+  var resultsToKeep = 15;
+  var movingUpRateThreshold = -1;
+
+  var prevCenterOfMassY = 0;
+  function sampleMotion() {
+    var currCenterOfMassY = centerOfMassY(prevSampling);
+    if(currCenterOfMassY > movingUpThreshold*prevCenterOfMassY) //increase as moving down
+      guessMovingDown(1);
+    else
+      guessMovingDown(0);
+    selectSampling();
+    prevCenterOfMassY = centerOfMassY(prevSampling);
+    if(!isFinite(prevCenterOfMassY))
+      prevCenterOfMassY = 0;
+  }
+
+  var prevSampling = [];
+  function selectSampling() {
+    prevSampling.length = 0;
+    for (var i = samplingSize - 1; i >= 0; i--) 
+      selectSample();
+  }
+  function selectSample() {
+    var x,y;
+    for(var find1Attempts = 100; find1Attempts >= 0; find1Attempts--){
+      x = _.random(0, vidWidth-1);
+      y = _.random(0, vidHeight-1);
+      if(columns[y][x])
+        prevSampling.push( {x:x,y:y} );
+    }
+  }
+
+  var movementGuesses = [];
+  function guessMovingDown(down) {
+    movementGuesses.push(down);
+    if(movementGuesses.length>resultsToKeep)
+      movementGuesses.shift();
+  }
+
+  function isProbablyMovingDown(){
+    //console.log("guesses", movementGuesses, sum(movementGuesses)/movementGuesses.length);
+    return sum(movementGuesses)/movementGuesses.length > movingUpRateThreshold;
+  }
+
+  function sum(arr) {
+    var total = 0;
+    for(var i=arr.length-1;i>=0;i--)
+      total += arr[i];
+    return total;
+  }
+  function centerOfMassY(sampling) {
+    var valuesAtSampling = [];
+    for(var i = sampling.length-1; i>=0;i--) {
+      var s = sampling[i];
+      if(columns[s.y][s.x])
+        valuesAtSampling.push( s.y );
+    }
+    return sum(valuesAtSampling)/valuesAtSampling.length
+  }
+
   function draw() {
     getDifference();
-      scoreByScan();
+    scoreByScan();
+    sampleMotion();
   }
 
  
