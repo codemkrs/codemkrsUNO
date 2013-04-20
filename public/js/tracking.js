@@ -146,6 +146,7 @@ $(function() {
   }
 
   //GM - this isn't being used
+
   function scoreByNeighbors() {
     //NOW LET'S CALCULATE EACH SCORE BY WAY OF A NEIGHBORHOOD OPERATION
     /*
@@ -362,8 +363,7 @@ $(function() {
         score = scores[nCol][nRow]; // = columns[nCol][nRow];
         if (score > threshold) {
           if (preDipCol) {
-            for (mCol = preDipCol; mCol < nCol; mCol += 1) {
-            }
+            for (mCol = preDipCol; mCol < nCol; mCol += 1) {}
             preDipCol = 0;
             startCol = 0;
           } else if (!startCol) {
@@ -394,72 +394,67 @@ $(function() {
     }
 
 
-    if ( (highScore > lowestHighScore) && isProbablyMovingDown() ) {
-      _.throttle(fireSoundClip(targetX, targetY),200);
+    if ((highScore > lowestHighScore) && isProbablyMovingDown()) {
+      _.throttle(fireSoundClip(targetX, targetY), 200);
     }
   }
 
-
-  var samplingSize = 1000;
-  var movingUpThreshold = 1.001;
-  var resultsToKeep = 15;
-  var movingUpRateThreshold = -1;
-
-  var prevCenterOfMassY = 0;
   function sampleMotion() {
     var currCenterOfMassY = centerOfMassY(prevSampling);
-    if(currCenterOfMassY > movingUpThreshold*prevCenterOfMassY) //increase as moving down
-      guessMovingDown(1);
-    else
-      guessMovingDown(0);
+    if (currCenterOfMassY > movingUpThreshold * prevCenterOfMassY) //increase as moving down
+    guessMovingDown(1);
+    else guessMovingDown(0);
     selectSampling();
     prevCenterOfMassY = centerOfMassY(prevSampling);
-    if(!isFinite(prevCenterOfMassY))
-      prevCenterOfMassY = 0;
+    if (!isFinite(prevCenterOfMassY)) prevCenterOfMassY = 0;
   }
 
   var prevSampling = [];
+
   function selectSampling() {
     prevSampling.length = 0;
-    for (var i = samplingSize - 1; i >= 0; i--) 
-      selectSample();
+    for (var i = samplingSize - 1; i >= 0; i--)
+    selectSample();
   }
+
   function selectSample() {
-    var x,y;
-    for(var find1Attempts = 100; find1Attempts >= 0; find1Attempts--){
-      x = _.random(0, vidWidth-1);
-      y = _.random(0, vidHeight-1);
-      if(columns[y][x])
-        prevSampling.push( {x:x,y:y} );
+    var x, y;
+    for (var find1Attempts = 100; find1Attempts >= 0; find1Attempts--) {
+      x = _.random(0, vidWidth - 1);
+      y = _.random(0, vidHeight - 1);
+      if (columns[y][x]) prevSampling.push({
+        x: x,
+        y: y
+      });
     }
   }
 
   var movementGuesses = [];
+
   function guessMovingDown(down) {
     movementGuesses.push(down);
-    if(movementGuesses.length>resultsToKeep)
-      movementGuesses.shift();
+    if (movementGuesses.length > resultsToKeep) movementGuesses.shift();
   }
 
-  function isProbablyMovingDown(){
+  function isProbablyMovingDown() {
     //console.log("guesses", movementGuesses, sum(movementGuesses)/movementGuesses.length);
-    return sum(movementGuesses)/movementGuesses.length > movingUpRateThreshold;
+    return sum(movementGuesses) / movementGuesses.length > movingUpRateThreshold;
   }
 
   function sum(arr) {
     var total = 0;
-    for(var i=arr.length-1;i>=0;i--)
-      total += arr[i];
+    for (var i = arr.length - 1; i >= 0; i--)
+    total += arr[i];
     return total;
   }
+
   function centerOfMassY(sampling) {
     var valuesAtSampling = [];
-    for(var i = sampling.length-1; i>=0;i--) {
+    for (var i = sampling.length - 1; i >= 0; i--) {
       var s = sampling[i];
-      if(columns[s.y][s.x])
-        valuesAtSampling.push( s.y );
+      if (columns[s.y][s.x]) valuesAtSampling.push(s.y);
     }
-    return sum(valuesAtSampling)/valuesAtSampling.length
+    return sum(valuesAtSampling) / valuesAtSampling.length
   }
 
   function draw() {
@@ -467,8 +462,4 @@ $(function() {
     scoreByScan();
     sampleMotion();
   }
-
- 
-
-
 });
