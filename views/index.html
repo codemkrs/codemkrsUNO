@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
     </head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="/css/index.css" rel="stylesheet" type="text/css">
     <script>
     window.suppressVideo = true;
@@ -12,24 +13,23 @@
     </script>
     <body style="zoom: 1;">
         <div class="container">
-            <div class='video'>
-                <video style="display:none;" id="js-video" width="320" height="240">
-                </video>
-                <canvas style="display:none;" id="js-snapshot" class="css-snapshot" width="320"
-                height="240">
-                </canvas>
+            <h1>Head-bobble Drum Machine</h1>
+            <div class="row-fluid text-center">
+              <div class='video'>
+                  <video style="display:none;" id="js-video" width="320" height="240">
+                  </video>
+                  <canvas style="display:none;" id="js-snapshot" class="css-snapshot" width="320"
+                  height="240">
+                  </canvas>
+              </div>
+              <button style="display:none;" type="button" class="js-toggle-video">
+                  Toggle Video Feed
+              </button>
+              <button type="button" class="js-allow-video">
+                  Get Video Feed
+              </button>              
             </div>
-            <button style="display:none;" type="button" class="js-toggle-video">
-                Toggle Video Feed
-            </button>
-            <button type="button" class="js-allow-video">
-                Get Video Feed
-            </button>
-            <br/>
-            <img style="display:none;" class="css-pointer" id="js-pointer" src=""
-            />
         </div>
-        <!-- Now let's get the input going into the webcam feed-->
         <script src="http://code.jquery.com/jquery-2.0.0.js"> </script>
         <script type="text/javascript" src="/js/tracking.js"> </script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
@@ -39,7 +39,6 @@
         });
         window.suppressVideo && $(function() {
             _.delay(stubEnterEventInABit, 500);
-
 
           function stubEnterEventInABit() {
             window.enterArea.fire({
