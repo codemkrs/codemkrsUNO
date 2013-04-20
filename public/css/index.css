@@ -1,10 +1,44 @@
 /*
  * Stylesheet for whatever the fuck we're calling this
  */
-.visualEffects {
-  width: 32px;
-  height: 32px; }
+.visualEffect {
+  width: 64px;
+  height: 64px;
+  background-size: 64px 64px;
+  background-repeat: no-repeat;
+  position: absolute; }
+
+.visualEffect.crunch {
+  background-image: url("../img/crunch.png"); }
+
+.visualEffect.kapow {
+  background-image: url("../img/kapow.png"); }
+
+.visualEffect.sock {
+  background-image: url("../img/sock.png"); }
+
+.visualEffect.thwack {
+  background-image: url("../img/thwack.png"); }
+
+.visualEffect.zap {
+  background-image: url("../img/zap.png"); }
+
+.visualEffect.zlonk {
+  background-image: url("../img/zlonk.png"); }
 
 canvas {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg); }
+
+.video {
+  width: 320px;
+  height: 240px;
+  border: 1px solid grey; }
+
+.video-container {
+  border: 1px solid grey;
+  padding: 50px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2em; }
