@@ -21,7 +21,7 @@ $(function() {
     });
   }
   function getSoundArea(targetx) {
-    return Math.floor( targetx / areaWidth )
+    return window.app.soundFileTransform( Math.floor( targetx / areaWidth ) )
   }
 
   n.getUserMedia = n.getUserMedia || n.webkitGetUserMedia || n.mozGetUserMedia;

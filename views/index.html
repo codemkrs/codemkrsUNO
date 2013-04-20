@@ -15,6 +15,7 @@
         window.app = window.app || {};
         window.app.areas = [0, 1, 2];
         window.app.showOverLay = false;
+        window.app.soundFileTransform = function(x) { return x; }
     </script>
     
     <body style="zoom: 1;">
@@ -195,6 +196,10 @@
                 <input type="checkbox" id="show-areas" class="control">
                 <span class="label">Show Areas</span>
             </label></li>
+            <li><label>
+                <input type="checkbox" id="lefthanded" class="control">
+                <span class="label">Lefthanded</span>
+            </label></li>
         </ul>
         </div>
         <script src="http://code.jquery.com/jquery-2.0.0.js">
@@ -216,7 +221,6 @@
         </script>
         <script>
             window.enterArea.add(function(x) {
-                // console.log("area", x);
             });
             window.suppressVideo && $(function() {
                 _.delay(stubEnterEventInABit, 500);
@@ -235,7 +239,7 @@
                 $('.theme-switcher').click(function switchStyle() {
                     var style = $('#bootstrap-style')[0],
                         href = style.href;
-                    style.href = ~style.href.indexOf('/united-') ? style.href.replace('/united-', '/geo-') : style.href.replace('/geo-', '/united-')
+                        style.href = ~style.href.indexOf('/united-') ? style.href.replace('/united-', '/geo-') : style.href.replace('/geo-', '/united-')
                 });
 
 
@@ -261,6 +265,9 @@
                     $('.area-marker').toggle($(this).prop('checked'));
                 }).trigger('change');
 
+                $('#lefthanded').on('change', function(){
+                    window.soundFileTransform = $(this).prop('checked') ? _.identity : function(x) { return 2-x };
+                }).trigger('change');
             })
 
         </script>
