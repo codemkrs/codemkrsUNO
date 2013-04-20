@@ -3,8 +3,12 @@
 	var soundFiles = [
 		"A_KICK_02.wav",
 		"B_SNARE_2.wav",
-		"G_HAT_9.wav"
+		"G_HAT_9.wav",
+		"CyCdh_K3Tom-01.wav",
+		"CyCdh_K3Tom-04.wav",
+		"CyCdh_K3Tom-05.wav"
 	];
+
 	var  contextProto = window.AudioContext || window.webkitAudioContext || (function() {throw "ruh roh, no audioContext"})()
 		,context = new contextProto()
 		,sounds = {}
