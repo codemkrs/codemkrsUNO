@@ -215,20 +215,20 @@
         <script type="text/javascript" src="/js/jquery-ui-slider.js">
         </script>
         <script>
-                                window.enterArea.add(function(x) {
-                            // console.log("area", x);
-                        });
-                        window.suppressVideo && $(function() {
-                            _.delay(stubEnterEventInABit, 500);
+            window.enterArea.add(function(x) {
+                // console.log("area", x);
+            });
+            window.suppressVideo && $(function() {
+                _.delay(stubEnterEventInABit, 500);
 
-                            function stubEnterEventInABit() {
-                                window.enterArea.fire({
-                                    message: window.app.areas[_.random(0, window.app.areas.length - 1)],
-                                    time: new Date()
-                                });
-                                _.delay(stubEnterEventInABit, _.random(200, 1500));
-                            }
-                        })
+                function stubEnterEventInABit() {
+                    window.enterArea.fire({
+                        message: window.app.areas[_.random(0, window.app.areas.length - 1)],
+                        time: new Date()
+                    });
+                    _.delay(stubEnterEventInABit, _.random(200, 1500));
+                }
+            })
         </script>
         <script>
             $(function() {

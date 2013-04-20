@@ -3,32 +3,25 @@ window.enterArea = window.enterArea || $.Callbacks();
 $(function() {
   "use strict";
   var throttleAmmount = 600;
-  var vidEl = document.querySelector("#js-video"),
-    canvas = document.querySelector('#js-snapshot').getContext('2d'),
-    n = window.navigator,
-    newPixels, oldPixels, pixLength, targetX, targetY, $hl = $('#js-pointer'),
-    firstFrame = true,
-    intervalTime = 100,
-    columns, scores, vidWidth = vidEl.width,
-    vidHeight = vidEl.height;
-  var oldTotal = 0;
-
+  var vidEl =           document.querySelector("#js-video"),
+      canvas =          document.querySelector('#js-snapshot').getContext('2d'),
+      n =               window.navigator,
+      newPixels, oldPixels, pixLength, targetX, targetY, $hl = $('#js-pointer'),
+      firstFrame = true,
+      intervalTime = 100,
+      columns, scores, vidWidth = vidEl.width,
+      vidHeight = vidEl.height,
+      areaWidth = vidWidth / 3,
+      oldTotal = 0
+      ;
   function fireSoundClip(targetx, targety) {
-    var area = 0;
-    var areaRange = vidWidth / 3;
-    if (targetx < areaRange) {
-      area = 'hihat';
-    } else if (targetx < areaRange * 2) {
-      area = 'kick';
-    } else if (targetx < areaRange * 3) {
-      area = 'snare';
-    }
-
     window.enterArea.fire({
-      type: "motionTrackEvent",
-      sound: area,
+      sound: getSoundArea(targetx),
       time: new Date()
     });
+  }
+  function getSoundArea(targetx) {
+    return Math.floor( targetx / areaWidth )
   }
 
   n.getUserMedia = n.getUserMedia || n.webkitGetUserMedia || n.mozGetUserMedia;
@@ -143,143 +136,6 @@ $(function() {
       }
 
     }
-  }
-
-  //GM - this isn't being used
-
-  function scoreByNeighbors() {
-    //NOW LET'S CALCULATE EACH SCORE BY WAY OF A NEIGHBORHOOD OPERATION
-    /*
-      [],[],[],[ ],[ ],[1],[ ],[ ],[],[],[]
-      [],[],[],[ ],[ ],[1],[ ],[ ],[],[],[]
-      [],[],[],[1],[1],[?],[1],[1],[],[],[]
-      [],[],[],[ ],[ ],[1],[ ],[ ],[],[],[]
-      [],[],[],[ ],[ ],[1],[ ],[ ],[],[],[]
-    
-      You get a score of the total of the people around you
-    */
-
-    var i, j, rowLimit, colLimit, suspect, localSum, kMax = 100,
-      k;
-
-    /*
-      Now that we have the neighborhood scores for each pixel, we need to 
-      find the pixel with the highest score. That is the highest concentration
-      of Difference
-      
-    */
-
-    colLimit = columns.length;
-    rowLimit = columns[0].length;
-
-    //sum the score for each pixel
-    // more j means lower
-    // more i means righter
-    for (j = 0; j < vidHeight; j++) {
-      for (i = 0; i < vidWidth; i++) {
-        suspect = columns[i][j];
-        if (suspect) {
-          localSum = kMax;
-        } else {
-          localSum = 0;
-          continue;
-        }
-
-        // TODO for each value of k
-        // get each corner i - k, i + k, j - k, j + k
-        // sweep (non-inclusively) from [i - k][j - k] to [i - k][j + k]
-        // sweep (non-inclusively) from [i - k][j + k] to [i - k][j - k]
-        // sweep (non-inclusively) from [i + k][j - k] to [i + k][j + k]
-        // sweep (non-inclusively) from [i + k][j + k] to [i + k][j - k]
-        // sweep a minimum of 10 spaces
-        // sweep a maximum of 100 spaces
-        // when the sum is less than 1/4, stop the sweep
-
-        // work left
-        k = 0;
-        while (suspect && i - k >= 0 && k <= kMax) {
-          suspect = columns[i - k][j];
-          if (suspect) {
-            localSum += (kMax - k);
-          }
-          k += 1;
-        }
-
-        // work right
-        k = 0;
-        while (suspect && i + k < rowLimit && k <= kMax) {
-          suspect = columns[i + k][j];
-          if (suspect) {
-            localSum += (kMax - k);
-          }
-          k += 1;
-        }
-
-        // give points from a pixel for each pixel above it
-        /*
-        k = 0;
-        while (suspect && (j - k >= 0) && k <= kMax) {
-          suspect = columns[i][j - k];
-          if (suspect) {
-            localSum += (kMax - k);
-          }
-          k += 1;
-        }
-        */
-
-        // give points to a pixel for each pixel below it
-        k = 0;
-        while (suspect && (j + k < colLimit) && k <= kMax) {
-          suspect = columns[i][j + k];
-          if (suspect) {
-            //localSum += (kMax - k);
-            localSum += (kMax + k);
-          }
-          k += 1;
-        }
-
-        scores[i][j] = localSum;
-      }
-    }
-
-    var targetX = 0,
-      targetY = 0,
-      highScore = 0,
-      targetCount = 0;
-
-    for (i = 0; i < vidWidth; i++) {
-      for (j = 0; j < vidHeight; j++) {
-        if (scores[i][j] > highScore) {
-          highScore = scores[i][j];
-        }
-      }
-    }
-
-    if (highScore < kMax * 15) {
-      return;
-    }
-
-    //Find the pixel closest to the top left that has the highest score. The
-    //  pixel with the highest score is where the highlight box will appear.
-    var goodScore = highScore * 0.9;
-    for (i = 0; i < vidWidth; i++) {
-      for (j = 0; j < vidHeight; j++) {
-        if (scores[i][j] > goodScore) {
-          targetX += i,
-          targetY += j;
-          targetCount += 1;
-        }
-      }
-    }
-
-    if (targetCount < 10) {
-      return;
-    }
-
-    targetX = targetX / targetCount;
-    targetY = targetY / targetCount;
-
-    _.throttle(fireSoundClip(targetX, targetY), throttleAmmount);
   }
 
   function scoreByScan() {
