@@ -26,7 +26,6 @@ $(function() {
       area = 3;
     }
     window.enterArea.fire({
-      type: "motionTrackEvent",
       message: area,
       time: new Date()
     });
