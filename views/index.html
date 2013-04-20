@@ -281,9 +281,15 @@
                 $('#no-upstroke-check').on('change', function(){
                     window.app.noUpstrokeCheck = $(this).prop('checked');
                 });
-                $('#toms').on('change', function(){
+                var toms = $('#toms').on('change', function(){
                     window.app.soundFileTransform2 = !$(this).prop('checked') ? _.identity : function(x) { return 3+x };
                 }).trigger('change');
+                $(document).keypress(function(e){
+                     e.preventDefault()
+                     if(e.keyCode != 32)
+                        return;
+                    toms.prop('checked', !toms.prop('checked')).trigger('change');
+                });
             })
 
         </script>
