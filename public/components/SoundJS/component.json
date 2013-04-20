@@ -1,9 +1,0 @@
-{
-  "name": "SoundJS",
-  "version": "0.0.0",
-  "commit": "ad30a6219054cc03594cc83e435f1f22e550594a",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:CreateJS/SoundJS.git"
-  }
-}
