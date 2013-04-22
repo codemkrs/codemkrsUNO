@@ -24,7 +24,7 @@ $(function() {
     return window.app.soundFileTransform2( window.app.soundFileTransform( Math.floor( targetx / areaWidth ) ) );
   }
 
-  n.getUserMedia = n.getUserMedia || n.webkitGetUserMedia || n.mozGetUserMedia;
+  n.getUserMedia = n.getUserMedia || n.webkitGetUserMedia || n.mozGetUserMedia || (function() { throw "user media not supported" })()
 
   function initialize() {
     var i;
@@ -45,7 +45,7 @@ $(function() {
       scores[i] = [];
     }
 
-    window.navigator.getUserMedia({
+    n.getUserMedia({
       video: true
     }, function(stream) {
       vidEl.src = URL.createObjectURL(stream);
@@ -56,7 +56,7 @@ $(function() {
       $('.js-toggle-video').fadeIn();
       $('#js-snapshot').slideDown();
       $('#js-pointer').fadeIn();
-    });
+    }, console.error.bind(console));
   }
 
   suppressVideo || $('body').on('click', '.js-allow-video', initialize);
